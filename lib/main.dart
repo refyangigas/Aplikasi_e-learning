@@ -1,6 +1,6 @@
 import 'package:aplikasi_elearning/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'splash_screen.dart';  // Import splash screen
+import 'splash_screen.dart';  
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomeScreen(), // Set SplashScreen sebagai halaman pertama
+      home: const SplashScreen(), // Set SplashScreen sebagai halaman pertama
     );
   }
 }

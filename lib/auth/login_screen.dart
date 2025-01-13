@@ -1,5 +1,6 @@
 import 'package:aplikasi_elearning/auth/forgot_password_screen.dart';
 import 'package:aplikasi_elearning/auth/register_screen.dart';
+import 'package:aplikasi_elearning/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:aplikasi_elearning/splash_screen.dart';
 import 'package:aplikasi_elearning/main.dart';
@@ -83,21 +84,25 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 24),
 
               // Login button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Add login logic here
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF4DD0E1),
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+              ElevatedButton(
+                onPressed: () {
+                  // Add your authentication logic here
+                  // Jika login berhasil:
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    (route) =>
+                        false, // Ini akan menghapus semua route sebelumnya
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF4DD0E1),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Text('Login'),
                 ),
+                child: const Text('Login'),
               ),
               const SizedBox(height: 16),
 
