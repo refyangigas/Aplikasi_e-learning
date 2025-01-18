@@ -14,13 +14,39 @@ class _PreTestState extends State<PreTest> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("pre test page"),
+        title: const Text("Pre Test Page"),
         actions: const [],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(10.0),
         child: Column(
-          children: [],
+          children: [
+            const Text("1. What is the capital of France?"),
+            Row(
+              children: [
+                const Text("a) Berlin"),
+                const SizedBox(width: 10),
+                const Text("b) Madrid"),
+                const SizedBox(width: 10),
+                const Text("c) Paris"),
+                const SizedBox(width: 10),
+                const Text("d) Rome"),
+              ],
+            ),
+            const SizedBox(height: 20),
+            const Text("2. Which language is primarily spoken in Brazil?"),
+            Row(
+              children: [
+                const Text("a) Spanish"),
+                const SizedBox(width: 10),
+                const Text("b) Portuguese"),
+                const SizedBox(width: 10),
+                const Text("c) French"),
+                const SizedBox(width: 10),
+                const Text("d) English"),
+              ],
+            ),
+          ],
         ),
       ),
     );
