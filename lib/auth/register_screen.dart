@@ -42,6 +42,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 30),
 
+              // Register illustration
+              Image.asset(
+                'assets/images/Nerd-amico.png', // Add this image to your assets
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: 30),
+
               // Full Name field
               TextField(
                 controller: _fullNameController,
