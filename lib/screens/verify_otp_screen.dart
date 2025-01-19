@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:aplikasi_elearning/services/auth_services.dart';
+import 'package:aplikasi_elearning/main.dart';
+import 'package:aplikasi_elearning/auth/login_screen.dart';
 
 class VerifyOTPScreen extends StatefulWidget {
   final String email;
@@ -43,7 +45,6 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
                 ),
               ),
               const SizedBox(height: 30),
-
               Image.asset(
                 'assets/images/Nerd-amico.png',
                 height: 200,
@@ -51,7 +52,6 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
                 fit: BoxFit.contain,
               ),
               const SizedBox(height: 30),
-
               TextField(
                 controller: _otpController,
                 decoration: InputDecoration(
@@ -65,7 +65,6 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-
               TextField(
                 controller: _passwordController,
                 obscureText: true,
@@ -80,7 +79,6 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-
               TextField(
                 controller: _confirmPasswordController,
                 obscureText: true,
@@ -95,7 +93,6 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -146,14 +143,28 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password reset successful')),
+          const SnackBar(
+            content: Text('Password reset successful'),
+            backgroundColor: Color(0xFF4DD0E1),
+          ),
         );
-        Navigator.pushReplacementNamed(context, '/login');
+
+        // Navigasi ke login screen dan hapus semua route sebelumnya
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LoginScreen(),
+          ),
+          (route) => false, // Hapus semua route sebelumnya
+        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {

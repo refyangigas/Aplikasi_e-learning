@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:aplikasi_elearning/services/auth_services.dart';
+import 'package:aplikasi_elearning/screens/verify_otp_screen.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({Key? key}) : super(key: key);
@@ -9,6 +11,51 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _emailController = TextEditingController();
+  final _authService = AuthService();
+  bool _isLoading = false;
+
+    Future<void> _handleSendOTP() async {
+    if (_emailController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter your email')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _authService.forgotPassword(
+      email: _emailController.text,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('OTP has been sent to your email')),
+        );
+        
+        // Navigate to VerifyOTPScreen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VerifyOTPScreen(
+              email: _emailController.text,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,38 +123,29 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               const SizedBox(height: 24),
 
               // Send Login button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Add reset password logic here
-                    if (_emailController.text.isNotEmpty) {
-                      // Implement password reset functionality
-                      // Show success message or navigate back
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                              'Reset password link sent to ${_emailController.text}'),
-                        ),
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF4DD0E1),
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: const Text(
-                    'Send Login',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
+  SizedBox(
+    width: double.infinity,
+    child: ElevatedButton(
+      onPressed: _isLoading ? null : _handleSendOTP,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Color(0xFF4DD0E1),
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      child: _isLoading
+          ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
               ),
+            )
+          : const Text('Send Login'),
+    ),
+  ),
             ],
           ),
         ),

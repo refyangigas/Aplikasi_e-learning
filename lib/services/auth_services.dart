@@ -77,7 +77,8 @@ class AuthService {
     return prefs.getString('token');
   }
 
-  Future<void> forgotPassword(String email) async {
+// Method untuk mengirim OTP
+  Future<void> forgotPassword({required String email}) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/forgot-password'),
@@ -97,6 +98,7 @@ class AuthService {
     }
   }
 
+// Method untuk verifikasi OTP dan reset password
   Future<void> verifyOTP({
     required String email,
     required String otp,
