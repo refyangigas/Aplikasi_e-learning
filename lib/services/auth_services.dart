@@ -76,4 +76,54 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('token');
   }
+
+  Future<void> forgotPassword(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/forgot-password'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({'email': email}),
+      );
+
+      if (response.statusCode != 200) {
+        Map<String, dynamic> errorResponse = jsonDecode(response.body);
+        throw errorResponse['message'] ?? 'Failed to send OTP';
+      }
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  Future<void> verifyOTP({
+    required String email,
+    required String otp,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/verify-otp'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({
+          'email': email,
+          'otp': otp,
+          'password': password,
+          'password_confirmation': passwordConfirmation,
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        Map<String, dynamic> errorResponse = jsonDecode(response.body);
+        throw errorResponse['message'] ?? 'Failed to verify OTP';
+      }
+    } catch (e) {
+      throw e.toString();
+    }
+  }
 }

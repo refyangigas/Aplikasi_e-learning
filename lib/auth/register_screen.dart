@@ -19,56 +19,71 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _authService = AuthService();
   bool _isLoading = false;
 
-  // Tambahkan fungsi register
-  Future<void> _register() async {
-    if (_passwordController.text != _confirmPasswordController.text) {
+  Future<void> _handleRegister() async {
+    // Validasi input kosong
+    if (_fullNameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _confirmPasswordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Password tidak cocok'),
-          backgroundColor: Colors.red,
-        ),
+        const SnackBar(content: Text('Mohon isi semua field')),
       );
       return;
     }
 
-    setState(() => _isLoading = true);
+    // Validasi password match
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password tidak cocok')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
 
     try {
-      final response = await _authService.register(
+      await _authService.register(
         fullName: _fullNameController.text,
         email: _emailController.text,
         password: _passwordController.text,
         passwordConfirmation: _confirmPasswordController.text,
       );
 
-      await _authService.saveToken(response['token']);
-
       if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Registrasi berhasil'),
-            backgroundColor: Color(0xFF4DD0E1),
-          ),
+          const SnackBar(content: Text('Registrasi berhasil!')),
         );
-        Navigator.pushReplacementNamed(context, '/login');
+
+        Navigator.pop(context); // Kembali ke login screen
       }
     } catch (e) {
       if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(e.toString())),
         );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
       }
     }
   }
 
   @override
+  void dispose() {
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -169,7 +184,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _register,
+                  onPressed: _isLoading ? null : _handleRegister,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF4DD0E1),
                     padding: const EdgeInsets.symmetric(vertical: 15),
