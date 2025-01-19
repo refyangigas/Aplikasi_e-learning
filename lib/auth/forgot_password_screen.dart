@@ -40,7 +40,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               // Reset Password illustration
               Center(
                 child: Image.asset(
-                  'assets/images/Nerd-amico.png', // Add this image to your assets
+                  'assets/images/Trailer Icon.png', // Add this image to your assets
                   height: 200,
                   fit: BoxFit.contain,
                 ),
@@ -59,11 +59,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
               ),
               const SizedBox(height: 8),
-              
+
               // Reset Password address text
               Text(
                 'Reset Password address',
@@ -85,7 +86,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       // Show success message or navigate back
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Reset password link sent to ${_emailController.text}'),
+                          content: Text(
+                              'Reset password link sent to ${_emailController.text}'),
                         ),
                       );
                     }
