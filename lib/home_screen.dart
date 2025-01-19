@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:aplikasi_elearning/menu_materi.dart';
+import 'package:aplikasi_elearning/material_list_page.dart';
 import 'package:aplikasi_elearning/auth/login_screen.dart';
 import 'package:aplikasi_elearning/pre_test.dart';
 import 'package:aplikasi_elearning/post_test.dart';
@@ -110,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Colors.blue,
               () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MenuMateri()),
+                MaterialPageRoute(builder: (context) => MaterialListPage()),
               ),
             ),
             _buildMenuItem(
