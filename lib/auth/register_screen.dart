@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:aplikasi_elearning/splash_screen.dart';
 import 'package:aplikasi_elearning/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:aplikasi_elearning/services/auth_services.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -14,6 +16,57 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _authService = AuthService();
+  bool _isLoading = false;
+
+  // Tambahkan fungsi register
+  Future<void> _register() async {
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Password tidak cocok'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await _authService.register(
+        fullName: _fullNameController.text,
+        email: _emailController.text,
+        password: _passwordController.text,
+        passwordConfirmation: _confirmPasswordController.text,
+      );
+
+      await _authService.saveToken(response['token']);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Registrasi berhasil'),
+            backgroundColor: Color(0xFF4DD0E1),
+          ),
+        );
+        Navigator.pushReplacementNamed(context, '/login');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +148,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
 
               // Confirm Password field
               TextField(
@@ -117,9 +169,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Add register logic here
-                  },
+                  onPressed: _isLoading ? null : _register,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF4DD0E1),
                     padding: const EdgeInsets.symmetric(vertical: 15),
@@ -127,11 +177,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: const Text('Register'),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text('Register'),
                 ),
               ),
-              const SizedBox(height: 16),
-
               // Login link
               Center(
                 child: TextButton(

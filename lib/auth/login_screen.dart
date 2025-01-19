@@ -4,6 +4,10 @@ import 'package:aplikasi_elearning/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:aplikasi_elearning/splash_screen.dart';
 import 'package:aplikasi_elearning/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:aplikasi_elearning/services/auth_services.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -15,6 +19,42 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _authService = AuthService();
+  bool _isLoading = false;
+
+  Future<void> _login() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await _authService.login(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      await _authService.saveToken(response['token']);
+
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,28 +124,29 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 24),
 
               // Login button
-              ElevatedButton(
-                onPressed: () {
-                  // Add your authentication logic here
-                  // Jika login berhasil:
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) =>
-                        false, // Ini akan menghapus semua route sebelumnya
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4DD0E1),
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _login,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF4DD0E1),
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text('Login'),
                 ),
-                child: const Text('Login'),
               ),
-              const SizedBox(height: 16),
-
               // Register and Forgot Password links
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
