@@ -119,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Colors.orange,
               () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => PreTest()),
+                MaterialPageRoute(builder: (context) => PreTestScreen()),
               ),
             ),
             _buildMenuItem(
@@ -128,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Colors.purple,
               () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => PostTest()),
+                MaterialPageRoute(builder: (context) => PostTestScreen()),
               ),
             ),
             _buildMenuItem(
