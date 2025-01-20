@@ -1,58 +1,94 @@
 import 'dart:convert';
+import 'package:aplikasi_elearning/services/auth_services.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MaterialService {
-  static const String baseUrl = 'http://localhost:8000/api/v1';
+  final String baseUrl = 'http://localhost:8000/api/v1';
+  final AuthService _authService = AuthService();
 
-  Future<List<Material>> getMaterials() async {
-    // Dapatkan token dari SharedPreferences
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token'); // Pastikan key 'token' sesuai dengan yang Anda simpan
-    
-    if (token == null) {
-      throw Exception('Token not found');
-    }
-
-    final response = await http.get(
-      Uri.parse('$baseUrl/materials'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-      if (data['status'] == true) {
-        final List<dynamic> materialsJson = data['data'] as List;
-        return materialsJson.map((json) => Material.fromJson(json)).toList();
+  Future<List<MaterialModel>> getMaterials() async {
+    try {
+      final token = await _authService.getToken();
+      
+      if (token == null) {
+        throw 'Token not found. Please login first.';
       }
-      throw Exception(data['message']);
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/materials'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final List<MaterialModel> materials = (responseData['data'] as List)
+            .map((item) => MaterialModel.fromJson(item))
+            .toList();
+        return materials;
+      } else {
+        Map<String, dynamic> errorResponse = jsonDecode(response.body);
+        throw errorResponse['message'] ?? 'Failed to load materials';
+      }
+    } catch (e) {
+      throw e.toString();
     }
-    throw Exception('Failed to load materials');
+  }
+
+  Future<MaterialModel> getMaterialDetail(int id) async {
+    try {
+      final token = await _authService.getToken();
+      
+      if (token == null) {
+        throw 'Token not found. Please login first.';
+      }
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/materials/$id'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        return MaterialModel.fromJson(responseData['data']);
+      } else {
+        Map<String, dynamic> errorResponse = jsonDecode(response.body);
+        throw errorResponse['message'] ?? 'Failed to load material detail';
+      }
+    } catch (e) {
+      throw e.toString();
+    }
   }
 }
 
-// Model class
-class Material {
+class MaterialModel {
   final int id;
   final String title;
   final String content;
-  final String updatedAt;
+  final String? createdAt;
+  final String? updatedAt;
 
-  Material({
+  MaterialModel({
     required this.id,
     required this.title,
     required this.content,
-    required this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
   });
 
-  factory Material.fromJson(Map<String, dynamic> json) {
-    return Material(
+  factory MaterialModel.fromJson(Map<String, dynamic> json) {
+    return MaterialModel(
       id: json['id'],
       title: json['title'],
       content: json['content'],
+      createdAt: json['created_at'],
       updatedAt: json['updated_at'],
     );
   }
