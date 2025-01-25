@@ -1,3 +1,4 @@
+import 'package:aplikasi_elearning/profile_page.dart';
 import 'package:flutter/material.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
@@ -65,12 +66,29 @@ class _HomePageState extends State<HomePage> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      // Tambahkan logika navigasi atau logout di sini
-      if (index == 2) { // index untuk logout
-        // Implementasi logout
-        print('Logout pressed');
-      }
     });
+
+    if (index == 0) {
+      // Navigasi ke halaman Beranda
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } else if (index == 1) {
+      // Navigasi ke halaman Profil
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfilePage()),
+      );
+    } else if (index == 2) {
+      // Implementasi Logout
+      print('Logout pressed');
+      // Tambahkan logika logout
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   @override
