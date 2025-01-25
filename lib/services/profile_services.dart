@@ -3,7 +3,7 @@ import 'package:aplikasi_elearning/services/auth_services.dart';
 import 'package:http/http.dart' as http;
 
 class ProfileService {
-  final String baseUrl = 'http://localhost:8000/api/v1';
+  final String baseUrl = 'http://192.168.1.11:8000/api/v1';
   final AuthService _authService = AuthService();
 
   Future<Map<String, dynamic>> getProfile() async {

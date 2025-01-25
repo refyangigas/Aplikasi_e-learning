@@ -3,7 +3,7 @@ import 'package:aplikasi_elearning/services/auth_services.dart';
 import 'package:http/http.dart' as http;
 
 class VideoService {
-  final String baseUrl = 'http://localhost:8000/api/v1';
+  final String baseUrl = 'http://192.168.1.11:8000/api/v1';
   final AuthService _authService = AuthService();
 
   Future<List<VideoModel>> getVideos() async {
@@ -24,7 +24,7 @@ class VideoService {
         return (responseData['data'] as List)
             .map((item) => VideoModel.fromJson(item))
             .toList();
-      } 
+      }
       throw jsonDecode(response.body)['message'] ?? 'Failed to load videos';
     } catch (e) {
       throw e.toString();
@@ -44,8 +44,16 @@ class VideoModel {
   });
 
   String get videoId {
-    final uri = Uri.parse(youtubeUrl);
-    return uri.pathSegments.last.split('?').first;
+    try {
+      if (youtubeUrl.contains('youtu.be')) {
+        return youtubeUrl.split('/').last.split('?').first;
+      } else if (youtubeUrl.contains('youtube.com')) {
+        return Uri.parse(youtubeUrl).queryParameters['v'] ?? '';
+      }
+      return '';
+    } catch (e) {
+      return '';
+    }
   }
 
   factory VideoModel.fromJson(Map<String, dynamic> json) {

@@ -3,13 +3,13 @@ import 'package:aplikasi_elearning/services/auth_services.dart';
 import 'package:http/http.dart' as http;
 
 class ReferenceService {
-  final String baseUrl = 'http://localhost:8000/api/v1';
+  final String baseUrl = 'http://192.168.1.11:8000/api/v1';
   final AuthService _authService = AuthService();
 
   Future<List<ReferenceModel>> getReferences() async {
     try {
       final token = await _authService.getToken();
-      
+
       if (token == null) {
         throw 'Token not found. Please login first.';
       }

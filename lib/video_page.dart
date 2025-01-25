@@ -25,10 +25,18 @@ class _VideoPageState extends State<VideoPage> {
     );
   }
 
-  Widget _buildBody() {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
+Widget _buildBody() {
+  if (_isLoading) {
+    return const Center(child: CircularProgressIndicator());
+  }
+
+  if (_error != null) {
+    return Center(child: Text(_error!));
+  }
+
+  if (_videos.isEmpty) {
+    return const Center(child: Text('No videos available'));
+  }
 
     return ListView.builder(
       itemCount: _videos.length,
