@@ -1,7 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:aplikasi_elearning/services/UserGuide_services.dart';
 
-class PetunjukPengguna extends StatelessWidget {
+class PetunjukPengguna extends StatefulWidget {
   const PetunjukPengguna({Key? key}) : super(key: key);
+
+  @override
+  _PetunjukPenggunaState createState() => _PetunjukPenggunaState();
+}
+
+class _PetunjukPenggunaState extends State<PetunjukPengguna> {
+  final UserGuideService _service = UserGuideService();
+  List<UserGuideModel> _guides = [];
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadGuides();
+  }
+
+  Future<void> _loadGuides() async {
+    try {
+      final guides = await _service.getUserGuides();
+      setState(() {
+        _guides = guides;
+        _isLoading = false;
+        _error = null;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _error = e.toString();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -9,83 +42,78 @@ class PetunjukPengguna extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Petunjuk Pengguna'),
         backgroundColor: Theme.of(context).primaryColor,
-        elevation: 0,
       ),
-      body: FutureBuilder<String>(
-        future: Future.delayed(
-          const Duration(milliseconds: 500),
-          () => 'Content from API', // Replace with actual API call
-        ),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: RefreshIndicator(
+        onRefresh: _loadGuides,
+        child: _buildBody(),
+      ),
+    );
+  }
 
-          return SingleChildScrollView(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Theme.of(context).primaryColor.withOpacity(0.1),
-                    Colors.white,
-                  ],
+  Widget _buildBody() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_error != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(_error!, textAlign: TextAlign.center),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _loadGuides,
+                child: const Text('Coba Lagi'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_guides.isEmpty) {
+      return const Center(
+        child: Text('Tidak ada petunjuk pengguna'),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+      ),
+      child: ListView.builder(
+        itemCount: _guides.length,
+        itemBuilder: (context, index) {
+          final guide = _guides[index];
+          return Card(
+            elevation: 2,
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: ExpansionTile(
+              childrenPadding: const EdgeInsets.all(16),
+              title: Text(
+                'Petunjuk ${index + 1}',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).primaryColor.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Icon(
-                                  Icons.help_outline,
-                                  color: Theme.of(context).primaryColor,
-                                  size: 30,
-                                ),
-                              ),
-                              const SizedBox(width: 15),
-                              Text(
-                                'Panduan Aplikasi',
-                                style: Theme.of(context).textTheme.headlineSmall,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          Text(
-                            snapshot.data ?? '',
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+              children: [
+                Text(
+                  guide.content,
+                  style: const TextStyle(fontSize: 16),
                 ),
-              ),
+              ],
             ),
           );
         },
