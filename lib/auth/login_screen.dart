@@ -4,9 +4,9 @@ import 'package:aplikasi_elearning/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:aplikasi_elearning/splash_screen.dart';
 import 'package:aplikasi_elearning/main.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:aplikasi_elearning/services/auth_services.dart';
 
 class LoginScreen extends StatefulWidget {

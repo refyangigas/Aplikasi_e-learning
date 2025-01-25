@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthService {
-  final String baseUrl = 'http://192.168.1.6:8000/api/v1';
+  final String baseUrl = 'http://localhost:8000/api/v1';
+  final _storage = const FlutterSecureStorage();
 
   Future<Map<String, dynamic>> register({
     required String fullName,
@@ -68,13 +69,15 @@ class AuthService {
   }
 
   Future<void> saveToken(String token) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('token', token);
+    await _storage.write(key: 'token', value: token);
   }
 
   Future<String?> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token');
+    return await _storage.read(key: 'token');
+  }
+
+  Future<void> deleteToken() async {
+    await _storage.delete(key: 'token');
   }
 
 // Method untuk mengirim OTP

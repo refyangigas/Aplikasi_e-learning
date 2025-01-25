@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:aplikasi_elearning/splash_screen.dart';
 import 'package:aplikasi_elearning/main.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:aplikasi_elearning/services/auth_services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
