@@ -30,22 +30,33 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _loadProfile() async {
     try {
       final data = await _profileService.getProfile();
+      print('Profile Data: $data'); // Debug log
+
       setState(() {
         _profileData = data;
         _isLoading = false;
-        // Initialize controllers with existing data
-        _fullNameController.text = data['full_name'] ?? '';
-        _birthPlaceController.text = data['birth_place'] ?? '';
-        _selectedGender = data['gender'];
-        _selectedDate = data['birth_date'] != null
-            ? DateTime.parse(data['birth_date'])
-            : null;
+
+        // Akses data sesuai struktur baru
+        if (data['user'] != null) {
+          _fullNameController.text = data['user']['full_name'] ?? '';
+        }
+
+        if (data['profile'] != null) {
+          _birthPlaceController.text = data['profile']['birth_place'] ?? '';
+          _selectedGender = data['profile']['gender'];
+          _selectedDate = data['profile']['birth_date'] != null
+              ? DateTime.parse(data['profile']['birth_date'])
+              : null;
+        }
       });
     } catch (e) {
+      print('Error loading profile: $e'); // Debug log
       setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
     }
   }
 
@@ -157,7 +168,9 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
 
     return Scaffold(
@@ -179,18 +192,19 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   const CircleAvatar(
                     radius: 50,
-                    child: Icon(Icons.person, size: 50),
+                    backgroundColor: Colors.blue, // Sesuaikan dengan warna tema
+                    child: Icon(Icons.person, size: 50, color: Colors.white),
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    _profileData?['full_name'] ?? 'Test User',
+                    _profileData?['user']?['full_name'] ?? 'Test User',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    _profileData?['email'] ?? 'test@example.com',
+                    _profileData?['user']['email'] ?? '', // Ubah ini
                     style: const TextStyle(
                       color: Colors.grey,
                     ),
@@ -198,25 +212,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 ],
               ),
             ),
-            const Divider(),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Latest Score',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  if (_profileData?['last_three_scores'] != null)
-                    ..._buildScoreCards(_profileData!['last_three_scores']),
-                ],
-              ),
-            ),
+            if (_profileData?['scores'] != null)
+              ..._buildScoreCards(_profileData!['scores']),
           ],
         ),
       ),

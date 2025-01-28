@@ -17,6 +17,9 @@ class ProfileService {
         },
       );
 
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
@@ -24,6 +27,7 @@ class ProfileService {
         throw errorResponse['message'] ?? 'Failed to get profile';
       }
     } catch (e) {
+      print('Error in getProfile: $e');
       throw e.toString();
     }
   }
