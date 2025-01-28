@@ -158,8 +158,15 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 16),
             ...scores.map((score) {
-              // Parse tanggal dari string dan konversi ke waktu lokal
-              DateTime dateTime = DateTime.parse(score['date']).toLocal();
+              DateTime dateTime;
+              try {
+                // Parse ISO 8601 string dan konversi ke waktu lokal
+                dateTime = DateTime.parse(score['date']);
+              } catch (e) {
+                // Fallback jika parsing gagal
+                dateTime = DateTime.now();
+                print('Error parsing date: $e');
+              }
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
@@ -167,7 +174,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      DateFormat('dd MMM yyyy HH:mm').format(dateTime),
+                      DateFormat('dd MMM yyyy').format(dateTime),
                       style: const TextStyle(color: Colors.grey),
                     ),
                     Text(
