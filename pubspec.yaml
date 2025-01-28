@@ -43,6 +43,7 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   youtube_player_flutter: ^9.1.1
   youtube_player_iframe: ^5.2.1
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:

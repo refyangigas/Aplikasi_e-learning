@@ -21,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: _selectedIndex == 1 ? _buildMainContent() : _buildProfilePage(),
     );
   }
@@ -32,14 +33,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildMainContent() {
-    return ListView(
-      padding: EdgeInsets.zero,
-      children: [
-        _buildHeader(),
-        _buildGridMenu(),
-        const SizedBox(height: 20),
-        _buildBottomNavBar(),
-      ],
+    return Container(
+      color: Colors.white, // Tambahkan ini
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          _buildHeader(),
+          _buildGridMenu(),
+          const SizedBox(height: 20),
+          _buildBottomNavBar(),
+        ],
+      ),
     );
   }
 

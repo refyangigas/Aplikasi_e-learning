@@ -75,7 +75,6 @@ class _HomePageState extends State<HomePage> {
         MaterialPageRoute(builder: (context) => const HomePage()),
       );
     } else if (index == 1) {
-      // Navigasi ke halaman Profil
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const ProfilePage()),
