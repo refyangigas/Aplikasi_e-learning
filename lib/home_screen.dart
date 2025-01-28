@@ -7,6 +7,7 @@ import 'package:aplikasi_elearning/post_test.dart';
 import 'package:aplikasi_elearning/video_page.dart';
 import 'package:aplikasi_elearning/daftar_pustaka.dart';
 import 'package:aplikasi_elearning/petunjuk_pengguna.dart';
+import 'package:aplikasi_elearning/profile_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -22,31 +23,97 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: _selectedIndex == 1 ? _buildMainContent() : _buildProfilePage(),
+      body: _selectedIndex == 1 ? _buildMainContent() : ProfilePage(),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 4,
+              offset: const Offset(0, -1),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.logout),
+              label: 'LOGOUT',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'HOME',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'PROFIL',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Theme.of(context).primaryColor,
+          unselectedItemColor: Colors.grey,
+          onTap: (index) {
+            if (index == 0) {
+              _showLogoutDialog();
+            } else {
+              setState(() {
+                _selectedIndex = index;
+              });
+            }
+          },
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+        ),
+      ),
     );
   }
 
-  Widget _buildProfilePage() {
-    return const Center(
-      child: Text('Profile Page'),
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Apakah Anda yakin ingin keluar?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Batal'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+                );
+              },
+              child: const Text('Ya'),
+            ),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildMainContent() {
     return Container(
-      color: Colors.white, // Tambahkan ini
+      color: Colors.white,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           _buildHeader(),
           _buildGridMenu(),
           const SizedBox(height: 20),
-          _buildBottomNavBar(),
         ],
       ),
     );
   }
 
+  // Sisanya tetap sama (fungsi _buildHeader, _buildGridMenu, _buildMenuItem)
   Widget _buildHeader() {
     return Container(
       decoration: BoxDecoration(
@@ -207,106 +274,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildBottomNavBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, -3),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildNavItem(
-            icon: Icons.logout,
-            label: 'LOGOUT',
-            onTap: () => _showLogoutDialog(),
-            isSelected: false,
-          ),
-          _buildNavItem(
-            icon: Icons.home,
-            label: 'HOME',
-            onTap: () => setState(() => _selectedIndex = 1),
-            isSelected: _selectedIndex == 1,
-          ),
-          _buildNavItem(
-            icon: Icons.person,
-            label: 'PROFIL',
-            onTap: () => setState(() => _selectedIndex = 2),
-            isSelected: _selectedIndex == 2,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-    required bool isSelected,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color:
-                isSelected ? Theme.of(context).primaryColor : Colors.grey[600],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected
-                  ? Theme.of(context).primaryColor
-                  : Colors.grey[600],
-              fontSize: 12,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Logout'),
-          content: const Text('Apakah Anda yakin ingin keluar?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Batal'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                  (route) => false,
-                );
-              },
-              child: const Text('Ya'),
-            ),
-          ],
-        );
-      },
     );
   }
 }
