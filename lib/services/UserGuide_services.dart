@@ -3,7 +3,7 @@ import 'package:aplikasi_elearning/services/auth_services.dart';
 import 'package:http/http.dart' as http;
 
 class UserGuideService {
-  final String baseUrl = 'http://192.168.1.7:8000/api/v1';
+  final String baseUrl = 'http://192.168.1.13:8000/api/v1';
   final AuthService _authService = AuthService();
 
   Future<List<UserGuideModel>> getUserGuides() async {

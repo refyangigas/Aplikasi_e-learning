@@ -35,7 +35,7 @@ class Question {
 }
 
 class TestService {
-  final String baseUrl = 'http://192.168.1.7:8000/api/v1';
+  final String baseUrl = 'http://192.168.1.13:8000/api/v1';
   final storage = const FlutterSecureStorage();
   final http.Client client = http.Client();
 

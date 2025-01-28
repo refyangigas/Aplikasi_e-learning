@@ -26,8 +26,9 @@ class _PreTestScreenState extends State<PreTestScreen> {
   Future<void> loadQuestion() async {
     setState(() => isLoading = true);
     try {
-      final response = await _testService.getPreTestQuestion(currentQuestionIndex);
-      
+      final response =
+          await _testService.getPreTestQuestion(currentQuestionIndex);
+
       if (response['success']) {
         setState(() {
           currentQuestion = Question.fromJson(response['data']);
@@ -105,7 +106,8 @@ class _PreTestScreenState extends State<PreTestScreen> {
                         LinearProgressIndicator(
                           value: currentQuestionIndex / totalQuestions,
                           backgroundColor: Colors.orange.withOpacity(0.2),
-                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.orange),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                              Colors.orange),
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -143,7 +145,7 @@ class _PreTestScreenState extends State<PreTestScreen> {
                         optionText = currentQuestion?.optionD ?? '';
                         break;
                     }
-                    
+
                     return Card(
                       margin: const EdgeInsets.only(bottom: 8),
                       child: RadioListTile<String>(
@@ -162,7 +164,8 @@ class _PreTestScreenState extends State<PreTestScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       ElevatedButton.icon(
-                        onPressed: currentQuestionIndex > 1 ? previousQuestion : null,
+                        onPressed:
+                            currentQuestionIndex > 1 ? previousQuestion : null,
                         icon: const Icon(Icons.arrow_back),
                         label: const Text('Sebelumnya'),
                         style: ElevatedButton.styleFrom(
@@ -173,7 +176,9 @@ class _PreTestScreenState extends State<PreTestScreen> {
                         onPressed: selectedAnswer != null ? nextQuestion : null,
                         icon: const Icon(Icons.arrow_forward),
                         label: Text(
-                          currentQuestionIndex < totalQuestions ? 'Selanjutnya' : 'Selesai',
+                          currentQuestionIndex < totalQuestions
+                              ? 'Selanjutnya'
+                              : 'Selesai',
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange,
