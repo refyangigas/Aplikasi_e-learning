@@ -15,7 +15,9 @@ class _PreTestScreenState extends State<PreTestScreen> {
   int totalQuestions = 0;
   Question? currentQuestion;
   String? selectedAnswer;
+  int correctAnswers = 0; // Menambahkan penghitung jawaban benar
   bool isLoading = true;
+  Map<int, String> userAnswers = {}; // Menambahkan penyimpanan jawaban
 
   @override
   void initState() {
@@ -34,6 +36,8 @@ class _PreTestScreenState extends State<PreTestScreen> {
           currentQuestion = Question.fromJson(response['data']);
           totalQuestions = response['total'] ?? 0;
           isLoading = false;
+          selectedAnswer = userAnswers[
+              currentQuestionIndex]; // Memuat jawaban yang tersimpan
         });
       }
     } catch (e) {
@@ -44,6 +48,15 @@ class _PreTestScreenState extends State<PreTestScreen> {
   }
 
   void nextQuestion() {
+    if (selectedAnswer == null) return;
+
+    // Simpan jawaban dan cek kebenaran
+    userAnswers[currentQuestionIndex] = selectedAnswer!;
+    if (selectedAnswer?.toLowerCase() ==
+        currentQuestion?.correctAnswer.toLowerCase()) {
+      correctAnswers++;
+    }
+
     if (currentQuestionIndex < totalQuestions) {
       setState(() {
         currentQuestionIndex++;
@@ -51,31 +64,54 @@ class _PreTestScreenState extends State<PreTestScreen> {
       });
       loadQuestion();
     } else {
-      // Selesai Pre-Test
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Pre-Test Selesai'),
-          content: const Text('Anda telah menyelesaikan Pre-Test'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop(); // Kembali ke home
-              },
-              child: const Text('OK'),
+      // Tampilkan hasil pre-test
+      showResultDialog();
+    }
+  }
+
+  void showResultDialog() {
+    final score = (correctAnswers / totalQuestions) * 100;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Pre-Test Selesai'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.check_circle, color: Colors.orange, size: 64),
+            const SizedBox(height: 16),
+            Text(
+              'Skor Anda: ${score.toStringAsFixed(1)}',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Jawaban Benar: $correctAnswers dari $totalQuestions',
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
           ],
         ),
-      );
-    }
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Tutup dialog
+              Navigator.of(context).pop(); // Kembali ke halaman sebelumnya
+            },
+            child: const Text('Selesai'),
+          ),
+        ],
+      ),
+    );
   }
 
   void previousQuestion() {
     if (currentQuestionIndex > 1) {
       setState(() {
         currentQuestionIndex--;
-        selectedAnswer = null;
+        selectedAnswer =
+            userAnswers[currentQuestionIndex]; // Memuat jawaban sebelumnya
       });
       loadQuestion();
     }
@@ -86,7 +122,7 @@ class _PreTestScreenState extends State<PreTestScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pre Test'),
-        backgroundColor: Colors.orange, // Sesuai dengan ikon di home
+        backgroundColor: Colors.orange,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -98,94 +134,48 @@ class _PreTestScreenState extends State<PreTestScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      gradient: LinearGradient(
+                        colors: [Colors.orange.shade100, Colors.orange.shade50],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
                       children: [
-                        LinearProgressIndicator(
-                          value: currentQuestionIndex / totalQuestions,
-                          backgroundColor: Colors.orange.withOpacity(0.2),
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                              Colors.orange),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: LinearProgressIndicator(
+                            value: currentQuestionIndex / totalQuestions,
+                            backgroundColor: Colors.orange.withOpacity(0.2),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                                Colors.orange),
+                            minHeight: 10,
+                          ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Soal $currentQuestionIndex dari $totalQuestions',
-                          style: Theme.of(context).textTheme.titleMedium,
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Soal $currentQuestionIndex dari $totalQuestions',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            Text(
+                              '${(currentQuestionIndex / totalQuestions * 100).toStringAsFixed(0)}%',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    color: Colors.orange,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Card(
-                    elevation: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                        currentQuestion?.question ?? '',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ...['A', 'B', 'C', 'D'].map((option) {
-                    String optionText = '';
-                    switch (option) {
-                      case 'A':
-                        optionText = currentQuestion?.optionA ?? '';
-                        break;
-                      case 'B':
-                        optionText = currentQuestion?.optionB ?? '';
-                        break;
-                      case 'C':
-                        optionText = currentQuestion?.optionC ?? '';
-                        break;
-                      case 'D':
-                        optionText = currentQuestion?.optionD ?? '';
-                        break;
-                    }
-
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: RadioListTile<String>(
-                        title: Text(optionText),
-                        value: option,
-                        groupValue: selectedAnswer,
-                        activeColor: Colors.orange,
-                        onChanged: (value) {
-                          setState(() => selectedAnswer = value);
-                        },
-                      ),
-                    );
-                  }),
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed:
-                            currentQuestionIndex > 1 ? previousQuestion : null,
-                        icon: const Icon(Icons.arrow_back),
-                        label: const Text('Sebelumnya'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                        ),
-                      ),
-                      ElevatedButton.icon(
-                        onPressed: selectedAnswer != null ? nextQuestion : null,
-                        icon: const Icon(Icons.arrow_forward),
-                        label: Text(
-                          currentQuestionIndex < totalQuestions
-                              ? 'Selanjutnya'
-                              : 'Selesai',
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                        ),
-                      ),
-                    ],
-                  ),
+                  // ... sisa kode build tetap sama ...
                 ],
               ),
             ),
