@@ -157,28 +157,30 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             const SizedBox(height: 16),
-            ...scores
-                .map((score) => Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            DateFormat('dd MMM yyyy HH:mm')
-                                .format(DateTime.parse(score['date'])),
-                            style: const TextStyle(color: Colors.grey),
-                          ),
-                          Text(
-                            '${score['score']}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
+            ...scores.map((score) {
+              // Parse tanggal dari string dan konversi ke waktu lokal
+              DateTime dateTime = DateTime.parse(score['date']).toLocal();
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      DateFormat('dd MMM yyyy HH:mm').format(dateTime),
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                    Text(
+                      '${score['score']}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
-                    ))
-                .toList(),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
           ],
         ),
       ),
@@ -226,11 +228,23 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildProfileDetails() {
     final profile = _profileData?['profile'];
+
+    // Format tanggal lahir
+    String formattedBirthDate = '-';
+    if (profile?['birth_date'] != null && profile!['birth_date'].isNotEmpty) {
+      try {
+        final birthDate = DateTime.parse(profile['birth_date']);
+        formattedBirthDate = DateFormat('dd MMMM yyyy').format(birthDate);
+      } catch (e) {
+        formattedBirthDate = profile['birth_date'];
+      }
+    }
+
     return Column(
       children: [
         _buildInfoRow('Full Name', _profileData?['user']['full_name'] ?? '-'),
         _buildInfoRow('Birth Place', profile?['birth_place'] ?? '-'),
-        _buildInfoRow('Birth Date', profile?['birth_date'] ?? '-'),
+        _buildInfoRow('Birth Date', formattedBirthDate),
         _buildInfoRow('Gender', _capitalizeFirst(profile?['gender'] ?? '-')),
       ],
     );
